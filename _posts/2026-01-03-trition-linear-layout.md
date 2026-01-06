@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Notes on Linear Layout in Triton"
-date: 2026-12-03 12:00:00 +0000
+date: 2026-01-03 12:00:00 +0000
 categories: update
 ---
 # Extended notes on Triton Linear Layout
@@ -143,19 +143,23 @@ Lets say we now want to map the 3D (reg,lane,warp) dimension tuple to the 2D (ro
 
 We only have to be aware which bits contribute "how much" to which output dimension, for example:
 
+```
 reg  = 1 (0b01) -> col += 1
 reg  = 2 (0b10) -> row += 1
 lane = 1 (0b01) -> col += 2 
 lane = 2 (0b10) -> row += 2
 warp = 1 (0b1)  -> row += 4
+```
 
 Now similarly we could also map directly to the 1D output offset:
 
+```
 reg  = 1 (0b01) -> offset += 1
 reg  = 2 (0b10) -> offset += 4
 lane = 1 (0b01) -> offset += 2 
 lane = 2 (0b10) -> offset += 16
 warp = 1 (0b1)  -> offset += 32
+```
 
 Turns out the bit ownership we described above directly translate into the "A" matrix from the paper. 
 
