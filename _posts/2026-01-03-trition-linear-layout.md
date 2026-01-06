@@ -10,8 +10,6 @@ sources:
 - Awesome blog post: https://www.lei.chat/posts/triton-linear-layout-concept/
 -we aremplementation Header: https://github.com/triton-lang/triton/blob/d9facf3a6edbc819c80d58b87e689bc0c2632756/include/triton/Tools/LinearLayout.h
 
-## Intuition
-
 In the following tries to build some intuition behind the Linear Layouts in triton by "Rediscovering" the foundation of LLs with an example.
 
 For this assume we are working with a imaginative GPU whose warpsize is 4.
