@@ -1,11 +1,9 @@
 ---
 layout: post
 title:  "Notes on Linear Layout in Triton"
-date: 2026-01-03 12:00:00 +0000
+date: 2026-12-03 12:00:00 +0000
 categories: update
 ---
-# Extended notes on Triton Linear Layout
-
 sources: 
 
 - Paper: https://arxiv.org/pdf/2505.23819
@@ -38,7 +36,7 @@ row   7 |  28   29   30   31
 
 Now if we would want to load this matrix with our GPU using a single CTA of 2 warps with 4 threads each we could distribute the matrix across the warps/lanes/register in the following way:
 
-We denote the ownership as (wXtYrZ) = (warp X | lane Y | register Z)
+We denote the ownership as: `(wXtYrZ) = (warp X | lane Y | register Z)`
 
 ```
           col →
@@ -118,8 +116,8 @@ The key observation we can make here is that each bit of the warp/lane/reg ID co
 
 Lets first only take a look at the register IDs.
 
-We can see that if the bit at idx 0 of the register ID is 0 the offset bit at idx 0 is also 0. Consequently if bit 0 of the register ID is 1, bit 0 of the offset bit is also 1. 
-We can also see that if the bit at idx 1 of the register ID is 0 the offset bit at idx 2 is 0. Consequently if bit 1 of the register ID is 1, bit 2 of the offset bit is also 1. 
+- We can see that if the bit at idx 0 of the register ID is 0 the offset bit at idx 0 is also 0. Consequently if bit 0 of the register ID is 1, bit 0 of the offset bit is also 1. 
+- We can also see that if the bit at idx 1 of the register ID is 0 the offset bit at idx 2 is 0. Consequently if bit 1 of the register ID is 1, bit 2 of the offset bit is also 1. 
 
 Combinding this with the observation above means the register bits control one row bit and one column bit. 
 
@@ -165,16 +163,22 @@ Turns out the bit ownership we described above directly translate into the "A" m
 
 The only thing we have to do is to convert the ownership into binary as bitvectors like this:
 
+
+```
 r0 = 0b00001 = 1   (because reg bit 0 controls offset bit 0)
 r1 = 0b00100 = 4   (because reg bit 1 controls offset bit 2)
 l0 = 0b00010 = 2   (because thread bit 0 controls offset bit 1)
 l1 = 0b01000 = 8   (because thread bit 1 controls offset bit 3)
 w0 = 0b10000 = 16  (because warp bit 0 controls offset bit 4)
 
+```
+
 (Turns out this is also what is referred to as the basis of the linear layout!)
 
+```
 Basis vectors:           1     4      2      8     16
 In binary:           00001 00100  00010  01000  10000
+```
 
 Write each basis vector as a column (LSB at top):
 
@@ -205,8 +209,7 @@ int l1 = (lane_id & 2) << 2  # l1 owns bit 3 (we only shift by two because its a
 int w0 = (warp_id & 1) << 4  # w0 owns bit 4
 
 int offset = r0 | r1 | l0 | l1 | w0
-
 ```
 
-
+This would basically be the code the `apply` of a Linear Layout would generate. 
 
