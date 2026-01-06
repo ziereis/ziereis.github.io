@@ -123,15 +123,17 @@ Combinding this with the observation above means the register bits control one r
 
 We can make the same observation for the thread and warp IDs as well. So we would end up with the following ownership mapping:
 
-
 ```
-  INPUT BIT          →   OUTPUT BIT it controls
-  ─────────────────────────────────────────────
-  reg bit 0          →   offset bit 0  (col bit 0)
-  reg bit 1          →   offset bit 2  (row bit 0)
-  lane bit 0         →   offset bit 1  (col bit 1)
-  lane bit 1         →   offset bit 3  (row bit 1)
-  warp bit 0         →   offset bit 4  (row bit 2)
+reg_id    offset
+0b01    | 0b00001
+0b10    | 0b00100
+
+lane_id | offset
+0b01    | 0b00010
+0b10    | 0b01000
+
+warp    | offset
+0b1     | 0b10000
 ```
 
 
@@ -161,17 +163,7 @@ warp = 1 (0b1)  -> offset += 16
 
 Turns out the bit ownership we described above directly translate into the "A" matrix from the paper. 
 
-The only thing we have to do is to convert the ownership into binary as bitvectors like this:
-
-
-```
-r0 = 0b00001 = 1   (because reg bit 0 controls offset bit 0)
-r1 = 0b00100 = 4   (because reg bit 1 controls offset bit 2)
-l0 = 0b00010 = 2   (because thread bit 0 controls offset bit 1)
-l1 = 0b01000 = 8   (because thread bit 1 controls offset bit 3)
-w0 = 0b10000 = 16  (because warp bit 0 controls offset bit 4)
-
-```
+The only thing we have to do is convert the offset incremets into binary and concatenate them into a matrix. 
 
 (Turns out this is also what is referred to as the basis of the linear layout!)
 
@@ -185,11 +177,11 @@ Write each basis vector as a column (LSB at top):
 ```
              Reg       Lane     Warp
           bit0 bit1  bit0 bit1  bit0
-    A =   [ 1    0     0    0     0 ]  ← output bit 0 (col bit 0)
-          [ 0    0     1    0     0 ]  ← output bit 1 (col bit 1)
-          [ 0    1     0    0     0 ]  ← output bit 2 (row bit 0)
-          [ 0    0     0    1     0 ]  ← output bit 3 (row bit 1)
-          [ 0    0     0    0     1 ]  ← output bit 4 (row bit 2)
+    A =   [ 1    0     0    0     0 ]
+          [ 0    0     1    0     0 ]
+          [ 0    1     0    0     0 ]
+          [ 0    0     0    1     0 ]  
+          [ 0    0     0    0     1 ]
 ```
 
 Using this information, we could now implement the reg/lane/warp index mapping the following way:
