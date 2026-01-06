@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Notes on Linear Layout in Triton"
-date: 2026-12-03 12:00:00 +0000
+date: 2026-01-03 12:00:00 +0000
 categories: update
 ---
 sources: 
