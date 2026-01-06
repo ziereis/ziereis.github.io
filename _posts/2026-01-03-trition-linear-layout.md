@@ -155,8 +155,8 @@ Now similarly we could also map directly to the 1D output offset:
 reg  = 1 (0b01) -> offset += 1
 reg  = 2 (0b10) -> offset += 4
 lane = 1 (0b01) -> offset += 2 
-lane = 2 (0b10) -> offset += 16
-warp = 1 (0b1)  -> offset += 32
+lane = 2 (0b10) -> offset += 8
+warp = 1 (0b1)  -> offset += 16
 ```
 
 Turns out the bit ownership we described above directly translate into the "A" matrix from the paper. 
